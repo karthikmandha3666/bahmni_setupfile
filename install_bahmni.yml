@@ -1,0 +1,34 @@
+---
+- hosts: all
+  remote_user: root
+  tasks:
+    - name: Prerequisite for the fresh installation of Bahmni
+      yum: 
+        name: https://kojipkgs.fedoraproject.org//packages/zlib/1.2.11/19.fc30/x86_64/zlib-1.2.11-19.fc30.x86_64.rpm
+        state: present
+    - name: Install the bahmni command line program (Choose the version you want)
+      yum:
+        name: https://dl.bintray.com/bahmni/rpm/rpms/bahmni-installer-0.92-147.noarch.rpm
+        state: present
+    - name: setup a configuration file
+      shell:
+        cmd: curl -L https://tinyurl.com/yyoj98df >> /etc/bahmni-installer/setup.yml
+    - name: Ensure SELinux is set to enforcing mode
+      lineinfile:
+        path: /etc/bahmni-installer/setup.yml
+        regexp: '^SELINUX='
+        line: SELINUX=enforcing
+    - name: configure custom inventory file
+      shell:
+        cmd: echo "export BAHMNI_INVENTORY=local" >> ~/.bashrc
+    - name: inventory file instead of local
+      shell:
+        cmd: source ~/.bashrc
+    - name: installation_bahmni
+      shell:
+        cmd: bahmni install 
+
+            
+          
+
+
